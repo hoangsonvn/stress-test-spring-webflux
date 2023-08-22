@@ -1,0 +1,38 @@
+apply plugin: 'scala'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  // https://mvnrepository.com/artifact/io.gatling/gatling-app
+  implementation group: 'io.gatling', name: 'gatling-app', version: '3.8.3'
+// https://mvnrepository.com/artifact/io.gatling.highcharts/gatling-charts-highcharts
+  implementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version: '3.9.0'
+
+// https://mvnrepository.com/artifact/org.scala-lang/scala-library
+  implementation group: 'org.scala-lang', name: 'scala-library', version: '2.13.7'
+}
+
+task gatlingRun(type: JavaExec) {
+  description = 'Run gatling tests'
+  new File("${buildDir}/reports/gatling").mkdirs()
+
+  systemProperties System.getProperties()
+  classpath = sourceSets.test.runtimeClasspath + configurations.testCompile + configurations.testCompile
+  main = "io.gatling.app.Gatling"
+
+  args = [
+    '-s', 'simulation.LoadSimulation',
+    '-sf', 'test/resources',
+    '-df', 'test/resources',
+    '-rf', "${buildDir}/reports/gatling",
+  ]
+
+  jvmArgs = [
+    "-Xmx512m",
+    "-Xmx512m",
+    "-Djava.net.preferIPv4Stack=true",
+    "-Djava.net.preferIPv6Addresses=false"
+  ]
+}
